@@ -74,7 +74,6 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       ImageId: ami-0ac73f33a1888c64a
-      KeyName: DEMO_EC2
       IamInstanceProfile: !Ref ServerAdminInstanceProfile
       UserData:
         Fn::Base64: !Sub |
@@ -83,8 +82,7 @@ Resources:
           apt-get install apache2 -y
           systemctl start apache2.service
           cd /var/www/html
-          aws s3 cp s3://udacity-demo-1/udacity.zip .
-          unzip -o udacity.zip
+          echo "it works! Udagram, Udacity" > index.html
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t3.medium
