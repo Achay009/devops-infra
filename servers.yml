@@ -16,7 +16,7 @@ Resources:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2021-06-15'
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -29,18 +29,9 @@ Resources:
         - !Ref AWSManagedPolicyArn
   ServerAdminInstanceProfile:
     Type: AWS::IAM::InstanceProfile
-    Properties: 
+    Properties:
       Roles: 
         - Ref: ServerAdminRole
-
-        #!/bin/bash
-        apt-get update -y
-        apt-get install unzip awscli -y
-        apt-get install apache2 -y
-        systemctl start apache2.service
-        cd /var/www/html
-        aws s3 cp s3://udacity-demo-1/udacity.zip .
-        unzip -o udacity.zip
   LBSecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -67,8 +58,8 @@ Resources:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 80
+        ToPort: 80
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 22
@@ -82,9 +73,18 @@ Resources:
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      ImageId: ami-0ee02acd56a52998e
+      ImageId: ami-0ac73f33a1888c64a
       KeyName: DEMO_EC2
       IamInstanceProfile: !Ref ServerAdminInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update -y
+          apt-get install apache2 -y
+          systemctl start apache2.service
+          cd /var/www/html
+          aws s3 cp s3://udacity-demo-1/udacity.zip .
+          unzip -o udacity.zip
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t3.medium
@@ -142,7 +142,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 8
       HealthyThresholdCount: 2
-      Port: 8080
+      Port: 80
       Protocol: HTTP
       UnhealthyThresholdCount: 5
       VpcId: 
@@ -153,4 +153,6 @@ Outputs:
     LBDnsName:
         Description: Dns Link to the load balancer
         Value: !Join ["", ["http://", !GetAtt WebAppLB.DNSName]]
-        Export: !Sub ${EnvironmentName}-LINK
+        Export:
+          Name: !Sub ${EnvironmentName}-LBLINK
+
