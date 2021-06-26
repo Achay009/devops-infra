@@ -14,7 +14,7 @@ jobs:
       - run:
           name: "run aws cli and install in image"
           command: |
-            aws cloudformation create-stack \
+            aws cloudformation deploy \
               --template-file template.yml \
               --stack-name job-infra
               --region=us-east-1 \
