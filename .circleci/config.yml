@@ -17,6 +17,7 @@ jobs:
             aws cloudformation deploy \
               --template-file template.yml \
               --stack-name job-infra
+              --region=us-east-1 \
 workflows:
   # Name the workflow "welcome"
   run_and_set_aws_image:
