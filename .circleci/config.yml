@@ -3,11 +3,23 @@ version: 2.1
 # Use a package of configuration called an orb.
 orbs:
   # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
+  # welcome: circleci/welcome-orb@0.4.1
 # Orchestrate or schedule a set of jobs
+jobs:
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: "run aws cli and install in image"
+          command: |
+            aws cloudformation deploy \
+              --template-file template.yml \
+              --stack-name job-infra
 workflows:
   # Name the workflow "welcome"
-  welcome:
+  run_and_set_aws_image:
     # Run the welcome/run job in its own container
     jobs:
-      - welcome/run
+      - create_infrastructure
