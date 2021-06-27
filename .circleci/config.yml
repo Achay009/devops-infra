@@ -19,7 +19,7 @@ jobs:
               --stack-name job-infrastructure \
               --region=us-east-1 \
 workflows:
-  # Name the workflow "welcome"
+
   run_and_set_aws_image:
     # Run the welcome/run job in its own container
     jobs:
